@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import authenticationMiddleware from "./api/v1/auth/authentication";
 import { v1Router } from "./api/v1/router";
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(express.json());
 app.options(/(.*)/, cors());
 
 // 挂载路由
-app.use("/api/v1", v1Router);
+app.use("/api/v1", authenticationMiddleware, v1Router);
 
 // 基本路由
 app.get("/", (req, res) => {

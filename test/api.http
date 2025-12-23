@@ -1,7 +1,11 @@
 @Base_Url = http://localhost:3000/api/v1
+@token = Bearer sdjalskjlkasjljsalkdjlasjfasfasfasfds
 
 # 测试
 GET {{Base_Url}}/auth/login
+Authorization: {{token}}
 
 ### 提交登录信息 
 POST {{Base_Url}}/auth/login
+Content-Type: application/json
+Authorization: {{token}}
