@@ -1,0 +1,7 @@
+@Base_Url = http://localhost:3000/api/v1
+
+# 测试
+GET {{Base_Url}}/auth/login
+
+### 提交登录信息 
+POST {{Base_Url}}/auth/login
