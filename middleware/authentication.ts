@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../../../utils/auth/jwt";
-import type { userPayload } from "../../../utils/auth/jwt";
+import { verifyToken } from "../utils/auth/jwt";
+import type { userPayload } from "../utils/auth/jwt";
 
 // 扩展 Express 的 Request 类型，以便在后续处理中使用 user 信息
 declare global {

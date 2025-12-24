@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { LoginRouter } from "./auth/login";
+import { LoginRouter } from "./auth";
 const router = Router();
 // v1 主路由
 router.get("/", (req, res) => {
