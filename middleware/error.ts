@@ -13,6 +13,7 @@ const globalErrorHandler = (
   // 处理JSON格式错误
   if (err.message === "Unexpected end of JSON input")
     err = new AppError(400, "提交的数据有误，请修改后重试");
+  log.debug(err.stack);
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
