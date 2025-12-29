@@ -40,44 +40,32 @@ router.post("/", async (req, res, next) => {
       return next(new AppError(409, "用户名或邮箱已被使用,请重试"));
     }
     // 插入用户
-    try {
-      const dal_result_i = await dal_client.query(
-        'INSERT INTO "em_user" (email, name, pass_hash) VALUES ($1, $2, $3)',
-        [req_data.email, req_data.name, req_data.pass_hash]
-      );
-      // 成功插入用户,准备签署jwt token
-      // 获取用户id
-      try {
-        const dal_result_s = await dal_client.query(
-          'SELECT "uid", "name", "email", "role" FROM "em_user" WHERE "name" = $1 AND "email" = $2',
-          [req_data.name, req_data.email]
-        );
-        // 初始payload
-        const payload: userPayload = {
-          userId: dal_result_s.rows[0].uid,
-          email: dal_result_s.rows[0].email,
-          role: dal_result_s.rows[0].role,
-        };
-        // 签署token
-        const token = await signToken(payload);
-        // 将token写入数据库
-        const dal_result_i2 = await dal_client.query(
-          'INSERT INTO "em_token" (token, in_use, token_user) VALUES ($1, $2, $3)',
-          [token, true, payload.userId]
-        );
-        // 返回成功消息
-        log.debug("注册成功");
-        res.status(200).json({ status: "success", toekn: token });
-      } catch (err) {
-        // 注册失败
-        log.debug("注册失败");
-        return next(new AppError(500, "服务器内部错误,注册失败"));
-      }
-    } catch (err) {
-      // 注册失败
-      log.debug("注册失败");
-      return next(new AppError(500, "服务器内部错误,注册失败"));
-    }
+    await dal_client.query(
+      'INSERT INTO "em_user" (email, name, pass_hash) VALUES ($1, $2, $3)',
+      [req_data.email, req_data.name, req_data.pass_hash]
+    );
+    // 成功插入用户,准备签署jwt token
+    // 获取用户id
+    const dal_result_s = await dal_client.query(
+      'SELECT "uid", "name", "email", "role" FROM "em_user" WHERE "name" = $1 AND "email" = $2',
+      [req_data.name, req_data.email]
+    );
+    // 初始payload
+    const payload: userPayload = {
+      userId: dal_result_s.rows[0].uid,
+      email: dal_result_s.rows[0].email,
+      role: dal_result_s.rows[0].role,
+    };
+    // 签署token
+    const token = await signToken(payload);
+    // 将token写入数据库
+    const dal_result_i2 = await dal_client.query(
+      'INSERT INTO "em_token" (token, in_use, token_user) VALUES ($1, $2, $3)',
+      [token, true, payload.userId]
+    );
+    // 返回成功消息
+    log.debug("注册成功");
+    res.status(200).json({ status: "success", toekn: token });
   } catch (err) {
     // 注册失败
     log.debug("注册失败");
