@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>验证码</title>
+    <style>
+      /* 基础重置 */
+      body,
+      table,
+      td,
+      a {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      img {
+        -ms-interpolation-mode: bicubic;
+      }
+
+      /* 响应式样式：手机端自动调整 */
+      @media screen and (max-width: 600px) {
+        .email-container {
+          width: 100% !important;
+        }
+        .content-padding {
+          padding: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    "
+  >
+    <table
+      border="0"
+      cellpadding="0"
+      cellspacing="0"
+      width="100%"
+      style="background-color: #f4f4f4"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 0">
+          <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="600"
+            class="email-container"
+            style="
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <tr>
+              <td height="6" style="background-color: #007bff"></td>
+            </tr>
+
+            <tr>
+              <td class="content-padding" style="padding: 40px 50px">
+                <h1
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 24px;
+                    color: #333333;
+                    font-weight: bold;
+                  "
+                >
+                  身份验证
+                </h1>
+
+                <p
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #555555;
+                  "
+                >
+                  请在验证页面输入以下 6 位数字验证码：
+                </p>
+
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding: 20px 0">
+                      <div
+                        style="
+                          background-color: #f8f9fa;
+                          border: 1px solid #eeeeee;
+                          border-radius: 6px;
+                          padding: 15px 30px;
+                          display: inline-block;
+                        "
+                      >
+                        <span
+                          style="
+                            font-size: 32px;
+                            font-weight: normal;
+                            letter-spacing: 5px;
+                            color: #007bff;
+                            font-family: Impact, Haettenschweiler,
+                              'Arial Narrow Bold', sans-serif;
+                          "
+                        >
+                          B - {{code}}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    margin: 20px 0 0;
+                    font-size: 14px;
+                    color: #999999;
+                    line-height: 1.5;
+                  "
+                >
+                  * 验证码有效期为 5 分钟。<br />
+                  * 如果这不是您本人的操作，请忽略。<br />
+                  * 请勿告知他人邮件内容。
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                align="center"
+                style="
+                  background-color: #f8f9fa;
+                  padding: 20px;
+                  border-top: 1px solid #eeeeee;
+                "
+              >
+                <p style="margin: 0; font-size: 12px; color: #aaaaaa">
+                  系统自动发送，请勿回复
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td height="40"></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
