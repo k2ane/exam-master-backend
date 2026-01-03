@@ -3,15 +3,26 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { v1Router } from "./api/v1/router";
-import { Dal } from "./utils/database/dal";
 import { Log } from "./utils/log/helper";
 import { globalErrorHandler } from "./middleware/error";
 import { AppError } from "./utils/error/appError";
+import mongoose from "mongoose";
+
+// 连接mongoose数据库
+mongoose
+  .createConnection(process.env.MONGODBURL as string, {
+    maxPoolSize: 10,
+  })
+  .asPromise()
+  .then(() => {
+    log.info("MongoDB数据库连接成功");
+  })
+  .catch((e) => {
+    log.error(`MongoDB数据库连接错误: ${e}`);
+  });
 
 // 引入express
 const app = express();
-// 创建数据库操作层
-const dal = new Dal();
 // 创建log
 const log = new Log();
 // 引入环境变量
@@ -48,4 +59,4 @@ app.all(/(.*)/, (req, res, next) => {
 app.use(globalErrorHandler);
 
 // 导出dal操作层以供其他功能
-export { dal, log };
+export { log };
