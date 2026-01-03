@@ -3,7 +3,6 @@ import { dal, log } from "../../../../app";
 import { AppError } from "../../../../utils/error/appError";
 import { RegisterUser } from "../../../../utils/auth/user_data_schema";
 import { signToken, type userPayload } from "../../../../utils/auth/jwt";
-import { boolean } from "zod";
 
 const router = Router();
 
@@ -12,7 +11,7 @@ router.post("/", async (req, res, next) => {
   var req_data = undefined;
   // 检测客户端是否提供数据
   try {
-    req_data = req.body.user;
+    req_data = req.body.email;
   } catch (err) {
     return next(new AppError(400, "错误, 提供的数据不完整"));
   }

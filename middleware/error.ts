@@ -9,7 +9,7 @@ const globalErrorHandler = (
   next: NextFunction
 ) => {
   err.statusCode = err.statusCode || 500;
-  log.debug(`错误, ${err}`);
+  // log.debug(`错误, ${err}`);
   // 处理JSON格式错误
   if (err.message === "Unexpected end of JSON input")
     err = new AppError(400, "提交的数据有误，请修改后重试");

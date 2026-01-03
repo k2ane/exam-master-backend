@@ -1,16 +1,13 @@
 import { Router } from "express";
 import nodemailer from "nodemailer";
-import { AppError } from "../../../utils/error/appError";
 import { randomInt } from "node:crypto";
 import { promises as fs } from "fs";
 import path from "node:path";
-import { log } from "../../../app";
+import { log } from "../../../../app";
+import { AppError } from "../../../../utils/error/appError";
 
 const router = Router();
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "mail" });
-});
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   try {
     // 读取文件夹内容
     const templatePath = path.join(
@@ -38,15 +35,17 @@ router.post("/", async (req, res) => {
     // 发送邮件
     await transporter.sendMail({
       from: '"Bondex训练场" mint1944@foxmail.com',
-      to: req.body.to, // 接受人
+      to: req.body.email, // 接受人
       subject: "身份认证 - 验证码", // 标题
       html: htmlContent, // 内容
     });
-    log.debug(`邮件发送成功, 发送地址: ${req.body.to}`);
-    return res.status(200).json(req.body);
+    log.debug(`邮件发送成功, 发送地址: ${req.body.email}`);
+    return res
+      .status(200)
+      .json({ status: "success", message: "验证码发送成功" });
   } catch (error) {
     log.debug(`邮件发送失败, 原因: ${error}`);
-    return new AppError(500, "邮件发送失败");
+    return next(new AppError(500, "验证码发送失败，服务器内部错误"));
   }
 });
 
@@ -55,4 +54,4 @@ function generateSecureOTP() {
   return code.toString();
 }
 
-export { router as MailRouter };
+export { router as VerificationRouter };
