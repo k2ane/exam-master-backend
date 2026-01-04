@@ -5,4 +5,8 @@ const zLoginInput = z.object({
   passcode: z.string(),
 });
 
-export { zLoginInput };
+const zVerificationInput = z.object({
+  email: z.email(),
+});
+
+export { zLoginInput, zVerificationInput };

@@ -6,20 +6,7 @@ import { v1Router } from "./api/v1/router";
 import { Log } from "./utils/log/helper";
 import { globalErrorHandler } from "./middleware/error";
 import { AppError } from "./utils/error/appError";
-import mongoose from "mongoose";
-
-// 连接mongoose数据库
-mongoose
-  .createConnection(process.env.MONGODBURL as string, {
-    maxPoolSize: 10,
-  })
-  .asPromise()
-  .then(() => {
-    log.info("MongoDB数据库连接成功");
-  })
-  .catch((e) => {
-    log.error(`MongoDB数据库连接错误: ${e}`);
-  });
+import { db } from "./utils/database/db";
 
 // 引入express
 const app = express();
@@ -43,20 +30,42 @@ app.get("/", (req, res) => {
   res.status(200).send({ message: "All Good! 😀" });
 });
 
-// 监听服务端口
+// 连接mongoDB数据库
+await db.connect();
 
-app.listen(port, async () => {
+// 监听服务端口
+const server = app.listen(port, async () => {
   log.info(`服务启动成功,运行在: http://localhost:${port} :)`);
   // 服务端创建成功后开始连接数据库
 });
 
-// 处理所有未知路由状态错误🔴
+// 处理所有未知路由状态错误
 app.all(/(.*)/, (req, res, next) => {
   log.debug(`错误, 请求路径不存在`);
   next(new AppError(404, `无法在服务器上找到 ${req.originalUrl}`));
 });
 
+// 全局错误处理中间件
 app.use(globalErrorHandler);
+
+// 处理退出事件，比如按下Ctrl+C或意外关闭的时候优雅退出
+const handleShutdown = async (signal: string) => {
+  log.info(`收到 ${signal} 信号，准备关闭服务器`);
+
+  // 关闭HTTP服务，不再接受新请求
+  server.close(() => {
+    log.info("HTTP 服务器 已关闭");
+  });
+  // 关闭数据库连接
+  log.info(`准备断开数据库连接`);
+  await db.disconnect();
+  log.info("服务器已关闭");
+  process.exit(0);
+};
+
+// 监听关闭信号
+process.on("SIGINT", () => handleShutdown("SIGINT"));
+process.on("SIGTERM", () => handleShutdown("SIGTERM"));
 
 // 导出dal操作层以供其他功能
 export { log };
