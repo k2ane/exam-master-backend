@@ -8,7 +8,6 @@ const expireTime = process.env.SECRET_KEY_EXPIRE_DATE || "24h";
 
 // 定义payload结构体
 interface userPayload extends JWTPayload {
-  userId: number;
   email: string;
   role: string;
 }

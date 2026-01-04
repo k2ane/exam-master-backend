@@ -52,44 +52,91 @@ router.post("/", async (req, res, next) => {
   ) {
     // 正确，将此验证码标记为已使用
     await f_data.updateOne({ is_used: true });
-    // 将用户写入数据库
-    await post_data.updateOne();
-    // 创建token payload
-    const payload = {
-      email: post_data.email,
-      role: post_data.role,
-    };
-    // 签发token
-    const token = await signToken(payload);
-    // 设置token过期时间 默认为7天
-    // 公式：天 * 小时 * 分钟 * 秒 * 毫秒
-    const v_expiresInMs = 7 * 24 * 60 * 60 * 1000;
-    // 创建过期时间对象
-    const v_expireDate = new Date(Date.now() + v_expiresInMs);
-    // 确认数据库中是否有未过期的token
-    const ft_data = await TokenModel.findOne({
+    // 检查用户是否已经存在
+    const u_data = await UserProfileModel.find({
+      email: v_data.data.email,
       is_active: true,
-      token: token,
-      email: post_data.email,
-      expires: { $gt: new Date() },
     });
-    if (!ft_data) {
-      // 签发新token
-      // 将token写入数据库
-      const t_data = await TokenModel.create({
-        token: token,
+    if (!u_data) {
+      // 用户不存在
+      // 将用户写入数据库
+      await UserProfileModel.create(post_data);
+      // 创建token payload
+      const payload = {
         email: post_data.email,
-        expires: v_expireDate,
+        role: post_data.role,
+      };
+
+      // 确认数据库中是否有未过期的token
+      const ft_data = await TokenModel.findOne({
         is_active: true,
+        // token: token,
+        email: post_data.email,
+        expires: { $gt: new Date() },
       });
-      // 如果存储失败
-      if (!t_data)
-        return next(new AppError(500, "签发token失败, 服务器内部错误"));
-      // 返回token
-      res.status(200).json({ status: "success", token: token });
+      if (!ft_data) {
+        // 签发新token
+        const token = await signToken(payload);
+        // 设置token过期时间 默认为7天
+        // 公式：天 * 小时 * 分钟 * 秒 * 毫秒
+        const v_expiresInMs = 7 * 24 * 60 * 60 * 1000;
+        // 创建过期时间对象
+        const v_expireDate = new Date(Date.now() + v_expiresInMs);
+        // 将token写入数据库
+        const t_data = await TokenModel.create({
+          token: token,
+          email: post_data.email,
+          expires: v_expireDate,
+          is_active: true,
+        });
+        // 如果存储失败
+        if (!t_data)
+          return next(new AppError(500, "签发token失败, 服务器内部错误"));
+        // 返回token
+        res.status(200).json({ status: "success", token: token });
+      } else {
+        // 返回旧token
+        res.status(200).json({ status: "success", token: ft_data.token });
+      }
     } else {
-      // 返回旧token
-      res.status(200).json({ status: "success", token: ft_data.token });
+      // 用户存在, 查询用户信息无误后,检查是否有已存在的token
+      // 确认数据库中是否有未过期的token
+      // 创建token payload
+      const payload = {
+        email: post_data.email,
+        role: post_data.role,
+      };
+      // 查询是否有已经存在的token
+      const ft_data = await TokenModel.findOne({
+        is_active: true,
+        // token: token,
+        email: post_data.email,
+        expires: { $gt: new Date() },
+      });
+      if (!ft_data) {
+        // 签发新token
+        const token = await signToken(payload);
+        // 设置token过期时间 默认为7天
+        // 公式：天 * 小时 * 分钟 * 秒 * 毫秒
+        const v_expiresInMs = 7 * 24 * 60 * 60 * 1000;
+        // 创建过期时间对象
+        const v_expireDate = new Date(Date.now() + v_expiresInMs);
+        // 将token写入数据库
+        const t_data = await TokenModel.create({
+          token: token,
+          email: post_data.email,
+          expires: v_expireDate,
+          is_active: true,
+        });
+        // 如果存储失败
+        if (!t_data)
+          return next(new AppError(500, "签发token失败, 服务器内部错误"));
+        // 返回token
+        res.status(200).json({ status: "success", token: token });
+      } else {
+        // 返回旧token
+        res.status(200).json({ status: "success", token: ft_data.token });
+      }
     }
   } else {
     // 错误, 请重试

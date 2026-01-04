@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthRouter } from "./auth/auth_route";
 import { UserRouter } from "./user";
 import authenticationMiddleware from "../../middleware/authentication";
+import { CheckTokenMiddlewate } from "../../middleware/check_token";
 const router = Router();
 // v1 主路由
 router.get("/", (req, res) => {
