@@ -57,9 +57,18 @@ router.post("/", async (req, res, next) => {
       email: v_data.data.email,
       is_active: true,
     });
-    if (!u_data) {
+    log.debug(
+      "======================================================================================="
+    );
+    console.log("查询到的用户资料如下:");
+    console.log(u_data);
+    log.debug(
+      "======================================================================================="
+    );
+    if (u_data[0] == null || !u_data[0]) {
       // 用户不存在
       // 将用户写入数据库
+      log.info(`新用户: ${v_data.data.email}，正在写入数据库`);
       await UserProfileModel.create(post_data);
       // 创建token payload
       const payload = {
@@ -75,6 +84,7 @@ router.post("/", async (req, res, next) => {
         expires: { $gt: new Date() },
       });
       if (!ft_data) {
+        log.info(`为用户: ${v_data.data.email} 签发新的Token`);
         // 签发新token
         const token = await signToken(payload);
         // 设置token过期时间 默认为7天
@@ -93,15 +103,18 @@ router.post("/", async (req, res, next) => {
         if (!t_data)
           return next(new AppError(500, "签发token失败, 服务器内部错误"));
         // 返回token
+
         res.status(200).json({ status: "success", token: token });
       } else {
-        // 返回旧token
+        // 返回旧token、
+        log.info(`用户: ${v_data.data.email} 拥有可用的token, 已返回`);
         res.status(200).json({ status: "success", token: ft_data.token });
       }
     } else {
       // 用户存在, 查询用户信息无误后,检查是否有已存在的token
       // 确认数据库中是否有未过期的token
       // 创建token payload
+      log.info(`用户存在: ${v_data.data.email}`);
       const payload = {
         email: post_data.email,
         role: post_data.role,
@@ -114,6 +127,7 @@ router.post("/", async (req, res, next) => {
         expires: { $gt: new Date() },
       });
       if (!ft_data) {
+        log.info(`为用户: ${v_data.data.email} 签发新的Token`);
         // 签发新token
         const token = await signToken(payload);
         // 设置token过期时间 默认为7天
@@ -135,6 +149,7 @@ router.post("/", async (req, res, next) => {
         res.status(200).json({ status: "success", token: token });
       } else {
         // 返回旧token
+        log.info(`用户: ${v_data.data.email} 拥有可用的token, 已返回`);
         res.status(200).json({ status: "success", token: ft_data.token });
       }
     }

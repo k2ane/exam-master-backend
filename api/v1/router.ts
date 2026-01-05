@@ -13,6 +13,7 @@ router.get("/", (req, res) => {
 });
 // 身份验证-登录 路由
 router.use("/auth", AuthRouter); //登录路由
-router.use("/user", authenticationMiddleware, UserRouter); // 用户路由
+// 用户路由，二次验证token是否有效
+router.use("/user", authenticationMiddleware, CheckTokenMiddlewate, UserRouter); // 用户路由
 
 export { router as v1Router };
